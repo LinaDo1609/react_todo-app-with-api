@@ -59,8 +59,12 @@ export const App: React.FC = () => {
 
   // прибираємо помилку через 3 секунди, а після вже видаляємо таймер
   useEffect(() => {
+    if (!error) return;
+
     const timer = setTimeout(() => {
-      setError(null);
+      if (typeof setError === 'function') {
+        setError(null);
+      }
     }, 3000);
 
     return () => clearTimeout(timer);
@@ -125,7 +129,6 @@ export const App: React.FC = () => {
       })
       .catch(() => {
         setError('Unable to update a todo');
-
         return Promise.reject();
       });
   };
