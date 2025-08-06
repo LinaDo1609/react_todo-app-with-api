@@ -151,7 +151,6 @@ export const TodoItem: React.FC<Props> = ({
         </>
       )}
 
-      {/* overlay will cover the todo while it is being deleted or updated */}
       <Loader loading={loading || tempLoader} />
     </div>
   );

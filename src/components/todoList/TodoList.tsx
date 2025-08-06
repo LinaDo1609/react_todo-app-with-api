@@ -25,14 +25,13 @@ export const TodoList: React.FC<Props> = ({
         />
       ))}
 
-      {/* todoTemp з'являється, коли йде загрузка запиту на додавання todo до серверу  */}
       {todoTemp && (
         <TodoItem
           todo={todoTemp}
           key={todoTemp.id}
           deleteTodo={deleteTodo}
           tempLoader={true}
-          updateTodo={updateTodo} // передаємо функцію оновлення todo
+          updateTodo={updateTodo}
         />
       )}
     </section>

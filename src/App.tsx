@@ -6,13 +6,20 @@ import { TodoList } from './components/todoList/TodoList';
 import { addTodo, deleteTodo, getTodos, updateTodo } from './api/todos';
 import { Todo } from './types/Todo';
 
-export const App: React.FC = () => {
-  enum FILTERS {
-    all = 'all',
-    completed = 'completed',
-    active = 'active',
-  }
+enum FILTERS {
+  all = 'all',
+  completed = 'completed',
+  active = 'active',
+}
 
+enum ERROR {
+  unableToLoad = 'Unable to load todos',
+  unableToAdd = 'Unable to add a todo',
+  unableToDelete = 'Unable to delete a todo',
+  unableToUpdate = 'Unable to update a todo',
+}
+
+export const App: React.FC = () => {
   const [todoList, setTodoList] = useState<Todo[]>([]);
   const [filter, setFilter] = useState('all');
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +37,7 @@ export const App: React.FC = () => {
           return true;
       }
     });
-  }, [todoList, filter, FILTERS.completed, FILTERS.active]);
+  }, [todoList, filter]);
 
   const completedTodos = useMemo(() => {
     return todoList.filter(todo => todo.completed === true);
@@ -46,20 +53,20 @@ export const App: React.FC = () => {
     return completed ? false : true;
   }, [todoList]);
 
-  //  перша загрузка данних на сторінку
   useEffect(() => {
     getTodos()
       .then(data => {
         setTodoList(data);
       })
       .catch(() => {
-        setError('Unable to load todos');
+        setError(ERROR.unableToLoad);
       });
   }, []);
 
-  // прибираємо помилку через 3 секунди, а після вже видаляємо таймер
   useEffect(() => {
-    if (!error) return;
+    if (!error) {
+      return;
+    }
 
     const timer = setTimeout(() => {
       if (typeof setError === 'function') {
@@ -70,14 +77,13 @@ export const App: React.FC = () => {
     return () => clearTimeout(timer);
   }, [error]);
 
-  // обробка фільтрів
   const handleFilter = (query: string) => {
     setFilter(query);
   };
 
   const addPost = (title: string) => {
-    setError(null); // очищаємо помилку, якщо вона була
-    setShouldFocus(false); // вимикаємо фокус на інпуті
+    setError(null);
+    setShouldFocus(false);
     setTempTodo({
       id: 0,
       userId: 3217,
@@ -89,10 +95,10 @@ export const App: React.FC = () => {
       .then(newPost => {
         setTodoList(prevList => [...prevList, newPost]);
         setTempTodo(null);
-        setShouldFocus(true); // знову вмикаємо фокус на інпуті
+        setShouldFocus(true);
       })
       .catch(() => {
-        setError('Unable to add a todo');
+        setError(ERROR.unableToAdd);
         setTempTodo(null);
         setShouldFocus(true);
 
@@ -100,7 +106,6 @@ export const App: React.FC = () => {
       });
   };
 
-  // видалення todo
   const deletePost = (postId: number) => {
     setError(null);
     setShouldFocus(false);
@@ -111,13 +116,12 @@ export const App: React.FC = () => {
         setShouldFocus(true);
       })
       .catch(() => {
-        setError('Unable to delete a todo');
+        setError(ERROR.unableToDelete);
 
         return Promise.reject();
       });
   };
 
-  // оновлення todo
   const updatePost = (todo: Todo) => {
     setError(null);
 
@@ -128,7 +132,8 @@ export const App: React.FC = () => {
         );
       })
       .catch(() => {
-        setError('Unable to update a todo');
+        setError(ERROR.unableToUpdate);
+
         return Promise.reject();
       });
   };
